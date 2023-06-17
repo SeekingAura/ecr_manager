@@ -120,13 +120,15 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+.env*
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+!.env*-base
 
 # Spyder project settings
 .spyderproject
@@ -158,3 +160,19 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# Data input
+data_input/
+
+# IDE - VSCode
+.vscode/*
+!.vscode/*-base.json
+!.vscode/*-base.jsonc
+!.vscode/extensions.json
+
+# Keep .gitkeep files
+# To keep an empty directory, add a .gitkeep file to it
+# and ignore the directory with a wildcard:
+#     /path/to/dir/*
+# this will ignore the content but not the director itself.
+!/**/.gitkeep
