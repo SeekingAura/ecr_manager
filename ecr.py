@@ -6,7 +6,7 @@ import logging.config
 import boto3
 import docker
 
-import settings
+import settings.settings as settings
 
 from _typing import ImagesData
 
