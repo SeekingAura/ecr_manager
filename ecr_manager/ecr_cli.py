@@ -2,13 +2,21 @@ import base64
 import json
 import logging
 import logging.config
+from typing import Any
 
 import boto3
 import docker
-
 import settings.settings as settings
-
-from typings import ImagesDataI
+from docker import DockerClient
+from mypy_boto3_ecr import ECRClient
+from mypy_boto3_sts import STSClient
+from typings import (
+    ECRAuthTokenI,
+    ECRCallerIdentityI,
+    ECRImagesIdI,
+    ECRListImagesI,
+    ImagesDataI,
+)
 
 
 def main() -> None:
@@ -17,28 +25,31 @@ def main() -> None:
     AWS_SECRET_ACCESS_KEY: str = settings.AWS_SECRET_ACCESS_KEY
     AWS_DEFAULT_REGION: str = settings.AWS_DEFAULT_REGION
 
-    aws_ecr = boto3.client(
+    aws_ecr: ECRClient = boto3.client(
         service_name="ecr",
         region_name=AWS_DEFAULT_REGION,
         aws_access_key_id=AWS_ACCESS_KEY_ID,
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     )
 
-    aws_sts = boto3.client(
+    aws_sts: STSClient = boto3.client(
         service_name="sts",
         region_name=AWS_DEFAULT_REGION,
         aws_access_key_id=AWS_ACCESS_KEY_ID,
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     )
 
-    ecr_auth = aws_ecr.get_authorization_token()
+    ecr_auth: ECRAuthTokenI = aws_ecr.get_authorization_token()
 
-    caller_identity = aws_sts.get_caller_identity()
+    caller_identity: ECRCallerIdentityI = aws_sts.get_caller_identity()
 
-    docker_client = docker.from_env()
+    docker_client: DockerClient = docker.from_env()
 
-    username = "AWS"
-    password = ecr_auth.get("authorizationData")[0].get("authorizationToken")
+    username: str = "AWS"
+    password: str = ecr_auth.get("authorizationData")[0].get(
+        "authorizationToken",
+        "",
+    )
 
     username, password = (
         base64.b64decode(password)
@@ -49,10 +60,13 @@ def main() -> None:
         )
     )
 
-    aws_account_id = caller_identity.get("Account")
-    registry = f"{aws_account_id}.dkr.ecr.{AWS_DEFAULT_REGION}.amazonaws.com"
+    aws_account_id: str = caller_identity.get("Account")
 
-    data = docker_client.login(
+    registry: str = (
+        f"{aws_account_id}.dkr.ecr.{AWS_DEFAULT_REGION}.amazonaws.com"  # noqa: E501
+    )
+
+    data: Any = docker_client.login(
         username=username,
         password=password,
         registry=registry,
@@ -63,7 +77,16 @@ def main() -> None:
         images_data: ImagesDataI = json.load(file_read)
 
     # Get untagged images BEFORE to push
-    images_untag_before = dict()
+    images_untag_before: dict[str, ECRImagesIdI] = dict()
+
+    for image_name_i in images_data.get("images").keys():
+        images_list_i: ECRListImagesI = aws_ecr.list_images(
+            repositoryName=image_name_i,
+            filter={
+                "tagStatus": "UNTAGGED",
+            },
+        )
+        images_untag_before[image_name_i] = images_list_i.get("imageIds")
 
     for image_name_i in images_data.get("images").keys():
         images_list_i = aws_ecr.list_images(
@@ -77,7 +100,7 @@ def main() -> None:
     uploaded_images = dict()
     # Push images
     for image_name_i, image_tag_i in images_data.get("images").items():
-        repository_i = f"{registry}/{image_name_i}"
+        repository_i: str = f"{registry}/{image_name_i}"
         logging.info(f"pushing {repository_i}")
         pushed = False
         for line in docker_client.images.push(
