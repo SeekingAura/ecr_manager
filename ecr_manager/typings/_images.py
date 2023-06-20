@@ -1,5 +1,5 @@
 from typing import TypedDict
 
 
-class ImagesData(TypedDict):
+class ImagesDataI(TypedDict):
     images: dict[str, str]

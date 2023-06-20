@@ -1,28 +1,31 @@
 import logging
 import logging.config
-import os
 
 from .str_stylizer import str_stylizer
+import os
 
 
+# logger utils
 class FilterLogLevelSep(logging.Filter):
     """
     Print only certain level, one level at time
     """
 
-    def __init__(self, filter_levels=None):
+    def __init__(
+        self,
+        filter_levels: str = "",
+    ) -> None:
         super(FilterLogLevelSep, self).__init__()
-        self._filter_levels = filter_levels
+        self._filter_levels: str = filter_levels
 
-    def filter(self, record):
+    def filter(self, record: logging.LogRecord) -> bool:
         if record.levelname in self._filter_levels:
             return True
         return False
 
 
 LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
-
-LOG_LEVELS: tuple[str] = (
+LOG_LEVELS: tuple[str, ...] = (
     "DEBUG",
     "INFO",
     "WARNING",
