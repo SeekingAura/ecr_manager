@@ -1,0 +1,57 @@
+{
+    "[python]": {
+        "editor.rulers": [
+            {
+                "column": 79,
+                "color": "#eeff0070"
+            },
+            {
+                "column": 119,
+                "color": "#00ff0067"
+            }
+        ],
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true
+    },
+    "python.linting.flake8Args": [
+        "--exclude", "*.pyi"
+    ],
+    "python.formatting.provider": "black",
+    "editor.defaultFormatter": null,
+    "files.exclude": {
+        "**/env": true,
+        "**/__pycache__/": true
+    },
+    "search.exclude": {
+        "**/__pycache__/": true,
+        "**/env": true,
+        "**/locale": true
+    },
+    "python.analysis.extraPaths": [
+        "./env/lib/python3.9/site-packages"
+    ],
+    // "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    "editor.formatOnSave": false,
+    "editor.formatOnType": true,
+    "git.enabled": true,
+    "cSpell.words": [
+       "dateutil"
+    ],
+    "dotenv.enableAutocloaking": false,
+    "isort.args": [
+        "--force-grid-wrap",
+        "2",
+        "-m",
+        "VERTICAL_HANGING_INDENT",
+        "--trailing-comma"
+    ],
+    "isort.check": true,
+    "python.analysis.inlayHints.functionReturnTypes": true,
+    "python.analysis.inlayHints.variableTypes": true,
+    "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingTypeStubs": "information",
+        "reportUnknownMemberType": "information"
+    }
+}

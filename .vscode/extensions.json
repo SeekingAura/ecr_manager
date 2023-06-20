@@ -1,0 +1,23 @@
+{
+    "recommendations": [
+        // Python
+        "ms-python.black-formatter",
+        "ms-python.flake8",
+        "ms-python.isort",
+        "ms-python.vscode-pylance",
+
+        // Git
+        "eamodio.gitlens",
+
+        // Misc
+        "streetsidesoftware.code-spell-checker",
+        "wengerk.highlight-bad-chars",
+
+        // IDE pretty
+        "PKief.material-icon-theme",
+
+        // Tools
+        "doggy8088.quicktype-refresh",
+        "earshinov.sort-lines-by-selection",
+    ]
+}
