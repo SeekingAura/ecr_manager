@@ -6,17 +6,18 @@ from typing import Any
 
 import boto3
 import docker
-import settings.settings as settings
 from docker import DockerClient
-from mypy_boto3_ecr import ECRClient
-from mypy_boto3_sts import STSClient
 from typings import (
     ECRAuthTokenI,
     ECRCallerIdentityI,
+    ECRClientI,
     ECRImagesIdI,
     ECRListImagesI,
     ImagesDataI,
+    STSClientI,
 )
+
+import settings.settings as settings
 
 
 def main() -> None:
@@ -25,14 +26,14 @@ def main() -> None:
     AWS_SECRET_ACCESS_KEY: str = settings.AWS_SECRET_ACCESS_KEY
     AWS_DEFAULT_REGION: str = settings.AWS_DEFAULT_REGION
 
-    aws_ecr: ECRClient = boto3.client(
+    aws_ecr: ECRClientI = boto3.client(
         service_name="ecr",
         region_name=AWS_DEFAULT_REGION,
         aws_access_key_id=AWS_ACCESS_KEY_ID,
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     )
 
-    aws_sts: STSClient = boto3.client(
+    aws_sts: STSClientI = boto3.client(
         service_name="sts",
         region_name=AWS_DEFAULT_REGION,
         aws_access_key_id=AWS_ACCESS_KEY_ID,

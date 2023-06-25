@@ -2,8 +2,10 @@ from ._images import ImagesDataI
 from .boto3 import (
     ECRAuthTokenI,
     ECRCallerIdentityI,
+    ECRClientI,
     ECRImagesIdI,
     ECRListImagesI,
+    STSClientI,
 )
 
 __all__: list[str] = [
@@ -12,4 +14,6 @@ __all__: list[str] = [
     "ECRImagesIdI",
     "ECRListImagesI",
     "ImagesDataI",
+    "ECRClientI",
+    "STSClientI",
 ]
