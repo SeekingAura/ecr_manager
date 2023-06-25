@@ -20,7 +20,6 @@ mypy-boto3-sts==1.26.136
 packaging==23.1
 python-dateutil==2.8.2
 python-dotenv==1.0.0
-pywin32==306
 requests==2.31.0
 s3transfer==0.6.1
 six==1.16.0
