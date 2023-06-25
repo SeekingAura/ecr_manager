@@ -128,7 +128,7 @@ ENV/
 env.bak/
 venv.bak/
 
-!.env*-base
+!.env*-template
 
 # Spyder project settings
 .spyderproject
@@ -166,8 +166,8 @@ data_input/
 
 # IDE - VSCode
 .vscode/*
-!.vscode/*-base.json
-!.vscode/*-base.jsonc
+!.vscode/*-template.json
+!.vscode/*-template.jsonc
 !.vscode/extensions.json
 
 # Keep .gitkeep files
