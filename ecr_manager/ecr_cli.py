@@ -2,10 +2,7 @@ import base64
 import json
 import logging
 import logging.config
-from typing import (
-    TYPE_CHECKING,
-    Any,
-)
+from typing import TYPE_CHECKING
 
 import boto3
 import docker
@@ -15,14 +12,15 @@ import docker
 if TYPE_CHECKING:
     from .typings.boto3 import (
         ECRClientI,
-        # ECRImagesIdI,
-        # ECRListImagesI,
+        ECRImageIdI,
+        ECRListImagesI,
         # ImagesDataI,
         STSClientI,
         ECRAuthTokenI,
         ECRCallerIdentityI,
     )
     from .typings.docker import DockerClient as DockerClientI
+    from .typings.ecr_manager import DockerImagesData as DockerImagesDataI
 
 import settings.settings as settings
 
@@ -81,46 +79,40 @@ def main() -> None:
     )
 
     # Images to push
-    # with open("images_data.json", "r") as file_read:
-    #     images_data: ImagesDataI = json.load(file_read)
+    with open("images_data.json", "r") as file_read:
+        images_data: DockerImagesDataI = json.load(file_read)
 
-    # # Get untagged images BEFORE to push
-    # images_untag_before: dict[str, ECRImagesIdI] = dict()
+    # Get untagged/dangling images BEFORE to push
+    images_untag_before: dict[
+        str,
+        list[ECRImageIdI],
+    ] = dict()
 
-    # for image_name_i in images_data.get("images").keys():
-    #     images_list_i: ECRListImagesI = aws_ecr.list_images(
-    #         repositoryName=image_name_i,
-    #         filter={
-    #             "tagStatus": "UNTAGGED",
-    #         },
-    #     )
-    #     images_untag_before[image_name_i] = images_list_i.get("imageIds")
+    for image_name_i in images_data.get("images").keys():
+        images_list_i: ECRListImagesI = aws_ecr.list_images(
+            repositoryName=image_name_i,
+            filter={
+                "tagStatus": "UNTAGGED",
+            },
+        )
+        images_untag_before[image_name_i] = images_list_i.get("imageIds")
 
-    # for image_name_i in images_data.get("images").keys():
-    #     images_list_i = aws_ecr.list_images(
-    #         repositoryName=image_name_i,
-    #         filter={
-    #             "tagStatus": "UNTAGGED",
-    #         },
-    #     )
-    #     images_untag_before[image_name_i] = images_list_i.get("imageIds")
-
-    # uploaded_images = dict()
-    # # Push images
-    # for image_name_i, image_tag_i in images_data.get("images").items():
-    #     repository_i: str = f"{registry}/{image_name_i}"
-    #     logging.info(f"pushing {repository_i}")
-    #     pushed = False
-    #     for line in docker_client.images.push(
-    #         repository=repository_i,
-    #         tag=image_tag_i,
-    #         stream=True,
-    #         decode=True,
-    #     ):
-    #         logging.info(line)
-    #         if not pushed and line.get("status") == "Pushing":
-    #             uploaded_images[image_name_i] = "Pushed"
-    #             pushed = True
+    uploaded_images: dict[str, str] = dict()
+    # Push images
+    for image_name_i, image_tag_i in images_data.get("images").items():
+        repository_i: str = f"{registry}/{image_name_i}"
+        logging.info(f"pushing {repository_i}")
+        pushed = False
+        for line in docker_client.images.push(
+            repository=repository_i,
+            tag=image_tag_i,
+            stream=True,
+            decode=True,
+        ):
+            logging.info(line)
+            if not pushed and line.get("status") == "Pushing":
+                uploaded_images[image_name_i] = "Pushed"
+                pushed = True
 
     # # Everything is ok delete old images
     # for image_name_i, images_i in images_untag_before.items():

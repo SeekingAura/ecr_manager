@@ -5,8 +5,10 @@ from .boto3 import (
 )
 from .ecr import (
     ECRAuthTokenI,
-    ECRClientI,
     ECRCallerIdentityI,
+    ECRClientI,
+    ECRImageIdI,
+    ECRListImagesI,
 )
 from .sts import STSClientI
 
@@ -15,6 +17,8 @@ __all__: tuple[str, ...] = (
     "ECRAuthTokenI",
     "ECRCallerIdentityI",
     "ECRClientI",
+    "ECRImageIdI",
+    "ECRListImagesI",
     "Session",
     "setup_default_session",
     "STSClientI",
