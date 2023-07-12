@@ -14,9 +14,16 @@
         "editor.formatOnSave": true
     },
     "python.linting.flake8Args": [
-        "--exclude", "*.pyi"
+        "--exclude", "*.pyi",
+        "--max-line-length", "79"
     ],
     "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length", "79",
+        // Enable long line breaks
+        // https://github.com/psf/black/issues/1802
+        "--preview"
+    ],
     "editor.defaultFormatter": null,
     "files.exclude": {
         "**/env": true,
