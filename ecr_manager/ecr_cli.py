@@ -2,22 +2,22 @@ import base64
 import json
 import logging
 import logging.config
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import boto3
 import docker
-
-# from docker import DockerClient
+from settings import DATA_DIR
 
 if TYPE_CHECKING:
     from .typings.boto3 import (
         ECRClientI,
         ECRImageIdI,
         ECRListImagesI,
-        # ImagesDataI,
         STSClientI,
         ECRAuthTokenI,
         ECRCallerIdentityI,
+        ECRBatchDeleteImageResponseI,
     )
     from .typings.docker import DockerClient as DockerClientI
     from .typings.ecr_manager import DockerImagesData as DockerImagesDataI
@@ -69,17 +69,17 @@ def main() -> None:
     aws_account_id: str = caller_identity.get("Account")
 
     registry: str = (
-        f"{aws_account_id}.dkr.ecr.{AWS_DEFAULT_REGION}.amazonaws.com"  # noqa: E501
+        f"{aws_account_id}.dkr.ecr.{AWS_DEFAULT_REGION}.amazonaws.com"
     )
 
-    data: dict[str, str] = docker_client.login(
+    docker_client.login(
         username=username,
         password=password,
         registry=registry,
     )
 
     # Images to push
-    with open("images_data.json", "r") as file_read:
+    with open(Path(DATA_DIR, "images_data.json"), "r") as file_read:
         images_data: DockerImagesDataI = json.load(file_read)
 
     # Get untagged/dangling images BEFORE to push
@@ -97,51 +97,58 @@ def main() -> None:
         )
         images_untag_before[image_name_i] = images_list_i.get("imageIds")
 
-    uploaded_images: dict[str, str] = dict()
+    uploaded_images_status: dict[str, str] = dict()
     # Push images
     for image_name_i, image_tag_i in images_data.get("images").items():
         repository_i: str = f"{registry}/{image_name_i}"
         logging.info(f"pushing {repository_i}")
         pushed = False
-        for line in docker_client.images.push(
+        for push_info in docker_client.images.push(
             repository=repository_i,
             tag=image_tag_i,
             stream=True,
             decode=True,
         ):
-            logging.info(line)
-            if not pushed and line.get("status") == "Pushing":
-                uploaded_images[image_name_i] = "Pushed"
+            logging.info(push_info)
+            if not pushed and push_info.get("status") == "Pushing":
+                uploaded_images_status[image_name_i] = "Pushed"
                 pushed = True
 
-    # # Everything is ok delete old images
-    # for image_name_i, images_i in images_untag_before.items():
-    #     upload_status = uploaded_images.get(image_name_i)
-    #     if upload_status is None:
-    #         logging.warning(
-    #             f'Image "{image_name_i}" not uploaded, UNTAGGED images skip delete'
-    #         )
-    #         continue
-    #     if images_i:
-    #         # if (images_data.get(image_name_i)=="latest"):
-    #         response_delete = aws_ecr.batch_delete_image(
-    #             repositoryName=image_name_i,
-    #             imageIds=images_i,
-    #         )
-    #         logging.info(response_delete)
-    #     else:
-    #         logging.warning(
-    #             f"repo: {image_name_i}, do not have UNTAGGED images to delete",
-    #         )
+    # Everything is ok delete old dangling images
+    for image_name_i, images_i in images_untag_before.items():
+        upload_status: str = uploaded_images_status.get(image_name_i, "")
+        if not upload_status:
+            logging.warning(
+                f'Image "{image_name_i}" not uploaded, UNTAGGED images skip '
+                "delete"
+            )
+            continue
+        if images_i:
+            response_delete: ECRBatchDeleteImageResponseI = (
+                aws_ecr.batch_delete_image(
+                    repositoryName=image_name_i,
+                    imageIds=images_i,
+                )
+            )
+            logging.info(response_delete)
+        else:
+            logging.warning(
+                (
+                    f"repo: {image_name_i}, does not have UNTAGGED images to "
+                    "delete"
+                ),
+            )
 
-    # logging.debug("Remember AWS cli vars")
-    # logging.debug(f'export AWS_ACCESS_KEY_ID="{AWS_ACCESS_KEY_ID}"')
-    # logging.debug(f'export AWS_SECRET_ACCESS_KEY=f"{AWS_SECRET_ACCESS_KEY}"')
-    # logging.debug(f'export AWS_DEFAULT_REGION="{AWS_DEFAULT_REGION}"')
-    # logging.debug(f'export AWS_ACCOUNT_ID="{aws_account_id}"')
+    logging.debug("Remember AWS cli vars")
+    logging.debug(f'export AWS_ACCESS_KEY_ID="{AWS_ACCESS_KEY_ID}"')
+    logging.debug(f'export AWS_SECRET_ACCESS_KEY=f"{AWS_SECRET_ACCESS_KEY}"')
+    logging.debug(f'export AWS_DEFAULT_REGION="{AWS_DEFAULT_REGION}"')
+    logging.debug(f'export AWS_ACCOUNT_ID="{aws_account_id}"')
 
-    # logging.debug("Remember login command")
-    # logging.debug(
-    #     f"aws ecr get-login-password --region {AWS_DEFAULT_REGION} | "
-    #     f"docker login --username AWS --password-stdin {registry}",
-    # )
+    logging.debug("Remember login command")
+    logging.debug(
+        (
+            f"aws ecr get-login-password --region {AWS_DEFAULT_REGION} | "
+            f"docker login --username AWS --password-stdin {registry}"
+        ),
+    )
