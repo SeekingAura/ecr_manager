@@ -162,7 +162,7 @@ cython_debug/
 #.idea/
 
 # Data input
-data_input/
+data_input/*
 
 # IDE - VSCode
 .vscode/*
