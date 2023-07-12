@@ -9,12 +9,14 @@ from .ecr import (
     ECRClientI,
     ECRImageIdI,
     ECRListImagesI,
+    ECRBatchDeleteImageResponseI,
 )
 from .sts import STSClientI
 
 __all__: tuple[str, ...] = (
     "client",
     "ECRAuthTokenI",
+    "ECRBatchDeleteImageResponseI",
     "ECRCallerIdentityI",
     "ECRClientI",
     "ECRImageIdI",
