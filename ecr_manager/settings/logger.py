@@ -38,28 +38,14 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "simple": {
-            "format": "".join(
-                (
-                    "%(asctime)s ",
-                    "%(name)-12s ",
-                    "%(levelname)-8s ",
-                    "%(message)s ",
-                ),
-            ),
+            "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s ",
             "style": "%",
         },
-    }
-    | {
+    } | {
         f"simple.{level_i.lower()}": {
-            "format": "".join(
-                (
-                    "%(asctime)s ",
-                    getattr(str_stylizer, level_i),
-                    "%(name)-12s ",
-                    "%(levelname)-8s ",
-                    "%(message)s ",
-                    str_stylizer.reset,
-                ),
+            "format": (
+                f"%(asctime)s {getattr(str_stylizer, level_i)} %(name)-12s "
+                f"%(levelname)-8s %(message)s {str_stylizer.reset}"
             ),
             "style": "%",
         }
@@ -79,8 +65,7 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
-    }
-    | {
+    } | {
         f"console.{level_i.lower()}_only": {
             "class": "logging.StreamHandler",
             "formatter": f"simple.{level_i.lower()}",
@@ -93,7 +78,7 @@ LOGGING = {
         "": {
             "handlers": [
                 f"console.{level_i.lower()}_only" for level_i in LOG_LEVELS
-            ],  # noqa: E501
+            ],
             "level": LOG_LEVEL,
             "propagate": False,
         },
