@@ -1,4 +1,9 @@
-from typing import Any
+from typing import (
+    Any,
+    Generator,
+    TypedDict,
+    Optional,
+)
 
 from _typeshed import Incomplete
 
@@ -36,11 +41,29 @@ class RegistryData(Model):
     attrs: Incomplete
     def reload(self) -> None: ...
 
+class ImagePushProgressDetailI(TypedDict):
+    current: Optional[int]
+    total: Optional[int]
+
+class ImagePushInfoI(TypedDict):
+    status: str
+    """
+    Some Possible values
+    - "Layer already exists"
+    - "Pushing"
+    - "Preparing"
+    """
+    progressDetail: Optional[ImagePushProgressDetailI]
+    progress: str
+    id: Optional[str]
+
 class ImageCollection(Collection):
     model = Image
     def build(self, **kwargs): ...
     def get(self, name): ...
-    def get_registry_data(self, name, auth_config: Incomplete | None = ...): ...
+    def get_registry_data(
+        self, name, auth_config: Incomplete | None = ...
+    ): ...
     def list(
         self,
         name: Incomplete | None = ...,
@@ -49,7 +72,11 @@ class ImageCollection(Collection):
     ): ...
     def load(self, data): ...
     def pull(
-        self, repository, tag: Incomplete | None = ..., all_tags: bool = ..., **kwargs
+        self,
+        repository,
+        tag: Incomplete | None = ...,
+        all_tags: bool = ...,
+        **kwargs,
     ): ...
     def push(
         self,
@@ -58,7 +85,7 @@ class ImageCollection(Collection):
         stream: bool,
         decode: bool = ...,
         **kwargs: Any,
-    ): ...
+    ) -> Generator[ImagePushInfoI, None, None]: ...
     def remove(self, *args, **kwargs) -> None: ...
     def search(self, *args, **kwargs): ...
     def prune(self, filters: Incomplete | None = ...): ...
