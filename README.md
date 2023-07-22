@@ -20,7 +20,7 @@ python -m pip install -r ".\requirements\windows\stubs.txt"
 Before to run must config env vars (just follow *.env-template* file)
 
 #### AWS Vars
-- **AWS_ACCESS_KEY_ID**: Acces key ID that identifies the **IAM**
+- **AWS_ACCESS_KEY_ID**: Access key ID that identifies the **IAM**
 - **AWS_SECRET_ACCESS_KEY**: Secret Access key required for authentication
 - **AWS_DEFAULT_REGION**: Region where AWS resources are located, for ECR service check here https://docs.aws.amazon.com/general/latest/gr/ecr.html
 
