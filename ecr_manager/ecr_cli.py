@@ -10,7 +10,7 @@ import docker
 from settings import DATA_DIR
 
 if TYPE_CHECKING:
-    from .typings.boto3 import (
+    from typings.boto3 import (
         ECRClientI,
         ECRImageIdI,
         ECRListImagesI,
