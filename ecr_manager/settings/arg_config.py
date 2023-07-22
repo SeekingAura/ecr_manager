@@ -1,10 +1,9 @@
 import argparse
-from typing import TypedDict
+import os
+from pathlib import Path
 
-
-class ExampleValue(TypedDict):
-    run: str
-
+from .settings import DATA_DIR
+from typings.argparser_custom import ECRCliArgs
 
 # Parser config
 parser: argparse.ArgumentParser = argparse.ArgumentParser(
@@ -19,5 +18,17 @@ parser.add_argument(
         "gui",
     ),
     default="cli",
+    help="Determines run mode, default cli",
 )
-args_namespace: argparse.Namespace = parser.parse_args()
+parser.add_argument(
+    "-datai",
+    "--data-input",
+    type=os.path.abspath,
+    default=os.path.abspath(Path(DATA_DIR, "images_data.json")),
+    help=(
+        "load run json file with info of docker images Default "
+        f"{os.path.abspath(Path(DATA_DIR, 'images_data.json'))}"
+    ),
+)
+
+args_namespace: ECRCliArgs = ECRCliArgs(**vars(parser.parse_args()))
