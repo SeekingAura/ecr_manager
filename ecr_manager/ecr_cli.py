@@ -11,16 +11,16 @@ from settings import DATA_DIR
 
 if TYPE_CHECKING:
     from typings.boto3 import (
-        ECRClientI,
-        ECRImageIdI,
-        ECRListImagesI,
-        STSClientI,
-        ECRAuthTokenI,
-        ECRCallerIdentityI,
-        ECRBatchDeleteImageResponseI,
+        IECRClient,
+        IECRImageId,
+        IECRListImages,
+        ISTSClient,
+        IECRAuthToken,
+        IECRCallerIdentity,
+        IECRBatchDeleteImageResponse,
     )
-    from .typings.docker import DockerClient as DockerClientI
-    from .typings.ecr_manager import DockerImagesData as DockerImagesDataI
+    from .typings.docker import DockerClient as IDockerClient
+    from .typings.ecr_manager import IDockerImagesData
 
 import settings.settings as settings
 
@@ -31,25 +31,25 @@ def main() -> None:
     AWS_SECRET_ACCESS_KEY: str = settings.AWS_SECRET_ACCESS_KEY
     AWS_DEFAULT_REGION: str = settings.AWS_DEFAULT_REGION
 
-    aws_ecr: ECRClientI = boto3.client(
+    aws_ecr: IECRClient = boto3.client(
         service_name="ecr",
         region_name=AWS_DEFAULT_REGION,
         aws_access_key_id=AWS_ACCESS_KEY_ID,
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     )
 
-    aws_sts: STSClientI = boto3.client(
+    aws_sts: ISTSClient = boto3.client(
         service_name="sts",
         region_name=AWS_DEFAULT_REGION,
         aws_access_key_id=AWS_ACCESS_KEY_ID,
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     )
 
-    ecr_auth: ECRAuthTokenI = aws_ecr.get_authorization_token()
+    ecr_auth: IECRAuthToken = aws_ecr.get_authorization_token()
 
-    caller_identity: ECRCallerIdentityI = aws_sts.get_caller_identity()
+    caller_identity: IECRCallerIdentity = aws_sts.get_caller_identity()
 
-    docker_client: DockerClientI = docker.from_env()
+    docker_client: IDockerClient = docker.from_env()
 
     username: str = "AWS"
     password: str = ecr_auth.get("authorizationData")[0].get(
@@ -80,16 +80,16 @@ def main() -> None:
 
     # Images to push
     with open(Path(DATA_DIR, "images_data.json"), "r") as file_read:
-        images_data: DockerImagesDataI = json.load(file_read)
+        images_data: IDockerImagesData = json.load(file_read)
 
     # Get untagged/dangling images BEFORE to push
     images_untag_before: dict[
         str,
-        list[ECRImageIdI],
+        list[IECRImageId],
     ] = dict()
 
     for image_name_i in images_data.get("images").keys():
-        images_list_i: ECRListImagesI = aws_ecr.list_images(
+        images_list_i: IECRListImages = aws_ecr.list_images(
             repositoryName=image_name_i,
             filter={
                 "tagStatus": "UNTAGGED",
@@ -124,7 +124,7 @@ def main() -> None:
             )
             continue
         if images_i:
-            response_delete: ECRBatchDeleteImageResponseI = (
+            response_delete: IECRBatchDeleteImageResponse = (
                 aws_ecr.batch_delete_image(
                     repositoryName=image_name_i,
                     imageIds=images_i,

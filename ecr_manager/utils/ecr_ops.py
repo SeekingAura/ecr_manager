@@ -15,15 +15,15 @@ import docker
 
 if TYPE_CHECKING:
     from typings.boto3 import (
-        ECRClientI,
+        IECRClient,
         # ECRImageIdI,
         # ECRListImagesI,
-        STSClientI,
-        ECRAuthTokenI,
-        ECRCallerIdentityI,
+        ISTSClient,
+        IECRAuthToken,
+        IECRCallerIdentity,
         # ECRBatchDeleteImageResponseI,
     )
-    from typings.docker import DockerClient as DockerClientI
+    from typings.docker import DockerClient as IDockerClient
 
     # from typings.ecr_manager import DockerImagesData as DockerImagesDataI
 
@@ -44,9 +44,9 @@ class ECRManager:
     docker_registry: str
 
     # Client objs
-    aws_ecr: ECRClientI
-    aws_sts: STSClientI
-    docker_client: DockerClientI
+    aws_ecr: IECRClient
+    aws_sts: ISTSClient
+    docker_client: IDockerClient
 
     def __init__(
         self,
@@ -84,7 +84,7 @@ class ECRManager:
 
         # Docker
         self.docker_registry = self.get_docker_registry()
-        self.docker_client: DockerClientI = docker.from_env()
+        self.docker_client: IDockerClient = docker.from_env()
 
         self.auth_docker()
 
@@ -94,7 +94,7 @@ class ECRManager:
     ) -> None:
         aws_region_name = aws_region_name or self.aws_default_region
 
-        self.aws_ecr: ECRClientI = boto3.client(
+        self.aws_ecr: IECRClient = boto3.client(
             service_name="ecr",
             region_name=aws_region_name,
             aws_access_key_id=self.aws_access_key_id,
@@ -107,7 +107,7 @@ class ECRManager:
     ) -> None:
         aws_region_name = aws_region_name or self.aws_default_region
 
-        self.aws_sts: STSClientI = boto3.client(
+        self.aws_sts: ISTSClient = boto3.client(
             service_name="sts",
             region_name=aws_region_name or self.aws_default_region,
             aws_access_key_id=self.aws_access_key_id,
@@ -115,7 +115,7 @@ class ECRManager:
         )
 
     def get_ecr_docker_credentials(self) -> tuple[str, str]:
-        ecr_auth: ECRAuthTokenI = self.aws_ecr.get_authorization_token()
+        ecr_auth: IECRAuthToken = self.aws_ecr.get_authorization_token()
 
         auth_token: str = ecr_auth.get("authorizationData")[0].get(
             "authorizationToken",
@@ -138,7 +138,7 @@ class ECRManager:
         self,
         aws_region_name: str = "",
     ) -> str:
-        caller_identity: ECRCallerIdentityI = (
+        caller_identity: IECRCallerIdentity = (
             self.aws_sts.get_caller_identity()
         )
         aws_account_id: str = caller_identity.get("Account")

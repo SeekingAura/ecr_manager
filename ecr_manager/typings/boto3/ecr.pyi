@@ -7,11 +7,11 @@ from mypy_boto3_ecr.type_defs import (
 )
 from mypy_boto3_sts.type_defs import GetCallerIdentityResponseTypeDef
 
-ECRClientI = StubECRClient
-ECRAuthTokenI = GetAuthorizationTokenResponseTypeDef
-ECRCallerIdentityI = GetCallerIdentityResponseTypeDef
+IECRClient = StubECRClient
+IECRAuthToken = GetAuthorizationTokenResponseTypeDef
+IECRCallerIdentity = GetCallerIdentityResponseTypeDef
 
-ECRListImagesI = ListImagesResponseTypeDef
-ECRImageIdI = ImageIdentifierTypeDef
+IECRListImages = ListImagesResponseTypeDef
+IECRImageId = ImageIdentifierTypeDef
 
-ECRBatchDeleteImageResponseI = BatchDeleteImageResponseTypeDef
+IECRBatchDeleteImageResponse = BatchDeleteImageResponseTypeDef

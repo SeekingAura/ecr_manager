@@ -1,4 +1,4 @@
 from typing import TypedDict
 
-class DockerImagesData(TypedDict):
+class IDockerImagesData(TypedDict):
     images: dict[str, str]

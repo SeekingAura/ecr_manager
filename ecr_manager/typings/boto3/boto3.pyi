@@ -6,8 +6,8 @@ from typing import (
 
 from boto3.session import Session as Session
 
-from .ecr import ECRClientI
-from .sts import STSClientI
+from .ecr import IECRClient
+from .sts import ISTSClient
 
 def setup_default_session(**kwargs: Any) -> None: ...
 @overload
@@ -18,7 +18,7 @@ def client(
     aws_secret_access_key: str,
     *args: Any,
     **kwargs: Any,
-) -> ECRClientI: ...
+) -> IECRClient: ...
 @overload
 def client(
     service_name: Literal["sts",],
@@ -27,4 +27,4 @@ def client(
     aws_secret_access_key: str,
     *args: Any,
     **kwargs: Any,
-) -> STSClientI: ...
+) -> ISTSClient: ...

@@ -1,3 +1,3 @@
-from .docker_images import DockerImagesData
+from .docker_images import IDockerImagesData
 
-__all__: tuple[str, ...] = ("DockerImagesData",)
+__all__: tuple[str, ...] = ("IDockerImagesData",)

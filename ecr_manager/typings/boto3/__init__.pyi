@@ -4,24 +4,24 @@ from .boto3 import (
     setup_default_session,
 )
 from .ecr import (
-    ECRAuthTokenI,
-    ECRCallerIdentityI,
-    ECRClientI,
-    ECRImageIdI,
-    ECRListImagesI,
-    ECRBatchDeleteImageResponseI,
+    IECRAuthToken,
+    IECRCallerIdentity,
+    IECRClient,
+    IECRImageId,
+    IECRListImages,
+    IECRBatchDeleteImageResponse,
 )
-from .sts import STSClientI
+from .sts import ISTSClient
 
 __all__: tuple[str, ...] = (
     "client",
-    "ECRAuthTokenI",
-    "ECRBatchDeleteImageResponseI",
-    "ECRCallerIdentityI",
-    "ECRClientI",
-    "ECRImageIdI",
-    "ECRListImagesI",
+    "IECRAuthToken",
+    "IECRBatchDeleteImageResponse",
+    "IECRCallerIdentity",
+    "IECRClient",
+    "IECRImageId",
+    "IECRListImages",
     "Session",
     "setup_default_session",
-    "STSClientI",
+    "ISTSClient",
 )
