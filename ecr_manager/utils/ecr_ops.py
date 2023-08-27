@@ -1,38 +1,32 @@
 import base64
-
-# import json
 import logging
 import logging.config
 
-# from pathlib import Path
 from typing import TYPE_CHECKING
 
 import boto3
 
 import docker
 
-# from settings import DATA_DIR
-
 if TYPE_CHECKING:
     from typings.boto3 import (
         IECRClient,
-        # ECRImageIdI,
-        # ECRListImagesI,
         ISTSClient,
         IECRAuthToken,
         IECRCallerIdentity,
-        # ECRBatchDeleteImageResponseI,
     )
     from typings.docker import DockerClient as IDockerClient
 
-    # from typings.ecr_manager import DockerImagesData as DockerImagesDataI
-
-import settings.settings as settings
+import settings as settings
 
 logger: logging.Logger = logging.getLogger(__name__)
 
 
 class ECRManager:
+    """
+    Manage AWS ECR operations
+    """
+
     # AWS vars
     aws_default_region: str
     aws_access_key_id: str
@@ -44,9 +38,9 @@ class ECRManager:
     docker_registry: str
 
     # Client objs
-    aws_ecr: IECRClient
-    aws_sts: ISTSClient
-    docker_client: IDockerClient
+    aws_ecr: "IECRClient"
+    aws_sts: "ISTSClient"
+    docker_client: "IDockerClient"
 
     def __init__(
         self,
@@ -79,8 +73,13 @@ class ECRManager:
         self.aws_access_key_id: str = aws_access_key_id
         self.aws_secret_access_key: str = aws_secret_access_key
 
+        # Initialize ECR
         self.set_ecr_client()
         self.set_sts_client()
+
+        # Attributes
+        self.aws_account_id: str = self.get_aws_account_id()
+        self.docker_registry: str = self.get_docker_registry()
 
         # Docker
         self.docker_registry = self.get_docker_registry()
@@ -116,7 +115,7 @@ class ECRManager:
 
     def get_ecr_docker_credentials(self) -> tuple[str, str]:
         ecr_auth: IECRAuthToken = self.aws_ecr.get_authorization_token()
-
+        print(ecr_auth)
         auth_token: str = ecr_auth.get("authorizationData")[0].get(
             "authorizationToken",
             "",
@@ -134,21 +133,34 @@ class ECRManager:
         )
         return username, password
 
-    def get_docker_registry(
-        self,
-        aws_region_name: str = "",
-    ) -> str:
+    def get_aws_account_id(self) -> str:
+        """
+        Get the AWS root account ID where IAM is related
+        """
         caller_identity: IECRCallerIdentity = (
             self.aws_sts.get_caller_identity()
         )
+
         aws_account_id: str = caller_identity.get("Account")
-        aws_region_name = aws_region_name or self.aws_default_region
-        return f"{aws_account_id}.dkr.ecr.{aws_region_name}.amazonaws.com"
+        return aws_account_id
+
+    def get_docker_registry(
+        self,
+    ) -> str:
+        """Get the docker registry."""
+        return (
+            f"{self.aws_account_id}"
+            ".dkr.ecr."
+            f"{self.aws_default_region}.amazonaws.com"
+        )
 
     def auth_docker(
         self,
         docker_registry: str = "",
     ) -> None:
+        """
+        Authenticate on docker
+        """
         docker_registry = docker_registry or self.docker_registry
 
         username: str

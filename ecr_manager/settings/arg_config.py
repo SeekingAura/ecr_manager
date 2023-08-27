@@ -2,8 +2,9 @@ import argparse
 import os
 from pathlib import Path
 
-from .settings import DATA_DIR
 from typings.argparser_custom import ECRCliArgs
+
+from .settings import DATA_DIR
 
 # Parser config
 parser: argparse.ArgumentParser = argparse.ArgumentParser(
