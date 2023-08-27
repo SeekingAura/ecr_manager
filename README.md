@@ -1,3 +1,11 @@
+## Create docs
+python -m pydoc -w ecr_manager
+
+## Run unit tests
+go to ecr_manager folder and run
+```
+python -m unittest
+```
 ## Module requirements
 Requirements are separated by OS and check compatibility for these:
 - Windows 10 (Windows)
