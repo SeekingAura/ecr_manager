@@ -10,16 +10,15 @@
                 "color": "#00ff0067"
             }
         ],
+        "editor.formatOnType": true,
+        "editor.formatOnSave": true,
         "editor.defaultFormatter": "ms-python.black-formatter",
-        "editor.formatOnSave": true
     },
-    "python.linting.flake8Args": [
-        "--exclude", "*.pyi",
-        "--max-line-length", "79"
+    "flake8.args": [
+        "--exclude", "*.pyi"
     ],
-    "python.formatting.provider": "black",
-    "python.formatting.blackArgs": [
-        "--line-length", "79",
+    "black-formatter.args": [
+        "--line-length=79",
         // Enable long line breaks
         // https://github.com/psf/black/issues/1802
         "--preview"
@@ -27,38 +26,46 @@
     "editor.defaultFormatter": null,
     "files.exclude": {
         "**/env": true,
-        "**/__pycache__/": true
+        "**/__pycache__/": true,
     },
     "search.exclude": {
         "**/__pycache__/": true,
         "**/env": true,
-        "**/locale": true
     },
     "python.analysis.extraPaths": [
-        "./env/lib/python3.9/site-packages"
+        "./env/Lib/site-packages"
     ],
-    // "python.linting.enabled": true,
-    "python.linting.flake8Enabled": true,
-    "editor.formatOnSave": false,
-    "editor.formatOnType": true,
-    "git.enabled": true,
-    "cSpell.words": [
-       "dateutil"
-    ],
-    "dotenv.enableAutocloaking": false,
-    "isort.args": [
-        "--force-grid-wrap",
-        "2",
-        "-m",
-        "VERTICAL_HANGING_INDENT",
-        "--trailing-comma"
-    ],
-    "isort.check": true,
+    "python.analysis.stubPath": "ecr_manager/typings",
     "python.analysis.inlayHints.functionReturnTypes": true,
     "python.analysis.inlayHints.variableTypes": true,
     "python.analysis.typeCheckingMode": "strict",
     "python.analysis.diagnosticSeverityOverrides": {
         "reportMissingTypeStubs": "information",
         "reportUnknownMemberType": "information"
-    }
+    },
+    // Isort
+    "isort.args": [
+        "--force-grid-wrap", "2",
+        "-m", "VERTICAL_HANGING_INDENT",
+        "--trailing-comma",
+    ],
+    "isort.check": true,
+    // CSpell
+    "cSpell.diagnosticLevel": "Information",
+    "cSpell.customDictionaries": {
+        "custom_name": {
+            "name": "python_ecr_manager",
+            "path": "${workspaceRoot}/.vscode/cspell-python_ecr_manager.txt",
+            "description": "Words used in this project",
+            "addWords": true,
+            "scope":"workspace",
+            "noSuggest": false
+          }
+    },
+    "cSpell.dictionaries": [
+        // To disable a custom dict set !name, by default are enabled
+        "python_ecr_manager"
+    ],
+    // dotenv config
+    "dotenv.enableAutocloaking": false    
 }
