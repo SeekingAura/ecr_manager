@@ -96,7 +96,7 @@ class TestECRManager(unittest.TestCase):
         Test the get_aws_account_id method of the ECRManager
         """
         # Call the method and get the AWS account ID
-        aws_account_id = self.ecr_manager.get_aws_account_id()
+        aws_account_id = self.ecr_manager.__build_aws_account_id_sts()
 
         # Check that the AWS account ID is correct
         self.assertEqual(aws_account_id, "123456789012")
@@ -106,7 +106,7 @@ class TestECRManager(unittest.TestCase):
         Test the get_docker_registry method of the ECRManager
         """
         # Call the method and get the docker registry
-        docker_registry = self.ecr_manager.get_docker_registry()
+        docker_registry = self.ecr_manager.__build_docker_registry()
 
         # Check that the docker registry is correct
         self.assertEqual(
